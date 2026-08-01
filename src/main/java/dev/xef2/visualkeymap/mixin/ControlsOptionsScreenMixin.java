@@ -10,23 +10,27 @@ import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
-@Mixin(Screen.class)                     // 改为所有屏幕的基类
-public abstract class ControlsOptionsScreenMixin {
+@Mixin(Screen.class)
+public abstract class ControlsOptionsScreenMixin extends Screen {
+
+    protected ControlsOptionsScreenMixin(Text title) {
+        super(title);
+    }
 
     @Inject(method = "init", at = @At("TAIL"))
     private void addVisualKeymapButton(CallbackInfo ci) {
-        // 只在 ControlsOptionsScreen 里添加按钮
-        if ((Object) this instanceof ControlsOptionsScreen screen) {
+        // 仅在 ControlsOptionsScreen 里添加按钮
+        if ((Object) this instanceof ControlsOptionsScreen) {
             ButtonWidget button = ButtonWidget.builder(
                     Text.literal("Visual Keymap"),
                     btn -> {
-                        if (screen.client != null) {
-                            screen.client.setScreen(new VisualKeymapScreen(screen));
+                        if (this.client != null) {
+                            this.client.setScreen(new VisualKeymapScreen(this));
                         }
                     }
-            ).dimensions(screen.width / 2 - 100, screen.height - 28, 200, 20).build();
+            ).dimensions(this.width / 2 - 100, this.height - 28, 200, 20).build();
 
-            screen.addDrawableChild(button);
+            this.addDrawableChild(button);
         }
     }
 }
