@@ -31,7 +31,7 @@ public class VisualKeymapScreen extends Screen {
     private static final int KEYBOARD_PADDING = 5;
     private static final int DONE_BUTTON_HEIGHT = 20;
 
-    public VisualKeymapScreen(Screen parent, net.minecraft.client.option.GameOptions gameOptions) {
+    public VisualKeymapScreen(Screen parent) {
         super(Text.translatable(VisualKeymap.getTranslationKey("gui.title")));
         this.parent = parent;
     }
@@ -40,21 +40,18 @@ public class VisualKeymapScreen extends Screen {
     protected void init() {
         this.keyBindings = VisualKeymap.getKeyBindings();
 
-        // Calculate layout dimensions
         int headerHeight = 30;
         int doneArea = DONE_BUTTON_HEIGHT + 10;
         int contentHeight = this.height - headerHeight - doneArea;
         int keyboardHeight = contentHeight / 2;
         int listHeight = contentHeight - keyboardHeight;
 
-        // Done button at the bottom
         this.doneButton = ButtonWidget.builder(
                 Text.translatable("gui.done"),
                 (button) -> this.close()
         ).dimensions(this.width / 2 - 100, this.height - doneArea + 4, 200, DONE_BUTTON_HEIGHT).build();
         this.addDrawableChild(this.doneButton);
 
-        // Keyboard widget (upper half)
         this.keyboardWidget = new KeyboardWidget(
                 KEYBOARD_PADDING, headerHeight,
                 this.width - KEYBOARD_PADDING * 2, keyboardHeight - KEYBOARD_PADDING,
@@ -63,23 +60,22 @@ public class VisualKeymapScreen extends Screen {
         );
         this.keyboardWidget.refreshPositions();
 
-        // Register keyboard key widgets as children so they receive events
         for (KeyWidget kw : this.keyboardWidget.getKeyWidgetMap().values()) {
             this.addDrawableChild(kw);
         }
 
-        // Keybinds list (lower half)
         this.keybindsListWidget = new KeybindsListWidget(
                 this.client, this.width,
                 listHeight - KEYBOARD_PADDING,
                 headerHeight + keyboardHeight + KEYBOARD_PADDING,
+                20,
                 sharedData,
                 k -> {
                     k.resetToDefault();
                     this.keyboardWidget.updateKeyBindings();
                 }
         );
-        this.keybindsListWidget.setKeyBindings(this.getUnboundBindings());
+        this.keybindsListWidget.setKeyBindings(new ArrayList<>(this.getUnboundBindings()));
         this.addDrawableChild(this.keybindsListWidget);
     }
 
@@ -90,8 +86,9 @@ public class VisualKeymapScreen extends Screen {
     }
 
     private List<? extends KeyBinding> getBindingsForKey(InputUtil.Key key) {
+        int keyCode = key.getCode();
         return this.keyBindings.stream()
-                .filter(binding -> binding.getKeyCodes().contains(key.getCode()))
+                .filter(binding -> binding.getKeyCodes().contains(keyCode))
                 .toList();
     }
 
@@ -99,17 +96,17 @@ public class VisualKeymapScreen extends Screen {
         int keyCode = key.getCode();
         if (this.sharedData.selectedKeyCode != null && this.sharedData.selectedKeyCode == keyCode) {
             this.sharedData.selectedKeyCode = null;
-            this.keybindsListWidget.setKeyBindings(this.getUnboundBindings());
+            this.keybindsListWidget.setKeyBindings(new ArrayList<>(this.getUnboundBindings()));
         } else {
             this.sharedData.selectedKeyCode = keyCode;
-            this.keybindsListWidget.setKeyBindings(this.getBindingsForKey(key));
+            this.keybindsListWidget.setKeyBindings(new ArrayList<>(this.getBindingsForKey(key)));
         }
         this.sharedData.selectedKeyBinding = null;
     }
 
     private void setKeyBinding(boolean escape) {
-        this.sharedData.selectedKeyBinding.setBoundKeys(this.pressedKeys);
-        if (escape || this.pressedKeys.size() == this.sharedData.selectedKeyBinding.getMaxBoundKeys()) {
+        this.sharedData.selectedKeyBinding.setBoundKeys(new ArrayList<>(this.pressedKeys));
+        if (escape || this.pressedKeys.size() >= this.sharedData.selectedKeyBinding.getMaxBoundKeys()) {
             this.sharedData.selectedKeyBinding = null;
             this.pressedKeys.clear();
         }
@@ -131,7 +128,7 @@ public class VisualKeymapScreen extends Screen {
     public boolean keyPressed(int keyCode, int scanCode, int modifiers) {
         InputUtil.Key key = InputUtil.fromKeyCode(keyCode, scanCode);
         if (this.sharedData.selectedKeyBinding != null && !this.pressedKeys.contains(key)) {
-            if (keyCode != 256) { // 256 = GLFW_KEY_ESCAPE
+            if (keyCode != 256) {
                 this.pressedKeys.add(key);
             }
             this.setKeyBinding(keyCode == 256);
