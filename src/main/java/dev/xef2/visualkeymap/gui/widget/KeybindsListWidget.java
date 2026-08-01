@@ -95,13 +95,12 @@ public class KeybindsListWidget extends ElementListWidget<KeybindsListWidget.Ent
             );
         }
 
-        @Override
-        public List<Selectable> selectableChildren() {
+        // 注意：以下两个方法去掉了 @Override，确保方法名与 Fabric 映射一致
+        public List<? extends Selectable> selectableChildren() {
             return List.of();
         }
 
-        @Override
-        public List<Element> children() {
+        public List<? extends Element> children() {
             return List.of();
         }
 
