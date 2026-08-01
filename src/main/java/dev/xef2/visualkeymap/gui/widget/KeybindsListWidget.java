@@ -1,24 +1,47 @@
 package dev.xef2.visualkeymap.gui.widget;
 
+import dev.xef2.visualkeymap.api.KeyBinding;
+import dev.xef2.visualkeymap.gui.screen.VisualKeymapScreen;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.font.TextRenderer;
 import net.minecraft.client.gui.DrawContext;
+import net.minecraft.client.gui.Selectable;
 import net.minecraft.client.gui.widget.ElementListWidget;
-import net.minecraft.client.option.KeyBinding;
 import net.minecraft.text.Text;
 
+import java.util.ArrayList;
 import java.util.List;
 
 public class KeybindsListWidget extends ElementListWidget<KeybindsListWidget.Entry> {
 
-    private final List<KeyBinding> keyBindings;
+    private List<KeyBinding> keyBindings = new ArrayList<>();
+    private final VisualKeymapScreen.SharedData sharedData;
+    private final java.util.function.Consumer<KeyBinding> onReset;
 
-    public KeybindsListWidget(MinecraftClient client, int width, int height, int top, int bottom, int itemHeight) {
+    public KeybindsListWidget(
+            MinecraftClient client, int width, int height, int top,
+            int itemHeight,
+            VisualKeymapScreen.SharedData sharedData,
+            java.util.function.Consumer<KeyBinding> onReset
+    ) {
         super(client, width, height, top, itemHeight);
-        this.keyBindings = client.options.allKeys.stream().toList();
+        this.sharedData = sharedData;
+        this.onReset = onReset;
+    }
 
-        for (KeyBinding keyBinding : this.keyBindings) {
-            this.addEntry(new Entry(keyBinding));
+    public void setKeyBindings(List<KeyBinding> bindings) {
+        this.keyBindings = bindings;
+        rebuildEntries();
+    }
+
+    public void updateAllEntries() {
+        rebuildEntries();
+    }
+
+    private void rebuildEntries() {
+        this.clearEntries();
+        for (KeyBinding kb : this.keyBindings) {
+            this.addEntry(new Entry(kb));
         }
     }
 
@@ -41,31 +64,52 @@ public class KeybindsListWidget extends ElementListWidget<KeybindsListWidget.Ent
         }
 
         @Override
-        public void render(DrawContext context, int index, int y, int x, int entryWidth, int entryHeight, int mouseX, int mouseY, boolean hovered, float tickDelta) {
+        public void render(DrawContext context, int index, int y, int x, int entryWidth, int entryHeight,
+                           int mouseX, int mouseY, boolean hovered, float tickDelta) {
             TextRenderer textRenderer = MinecraftClient.getInstance().textRenderer;
 
             int contentY = y + 2;
             int contentX = x + 5;
 
+            Text displayName = keyBinding.getDisplayName();
             context.drawText(
-                textRenderer,
-                Text.literal(this.keyBinding.getTranslationKey()),
-                contentX,
-                contentY,
-                0xFFFFFF,
-                false
+                    textRenderer,
+                    displayName,
+                    contentX,
+                    contentY,
+                    sharedData.selectedKeyBinding == keyBinding ? 0xFFFF55 : 0xFFFFFF,
+                    false
             );
 
-            String keyName = this.keyBinding.getBoundKeyLocalizedText().getString();
-            int keyNameWidth = textRenderer.getWidth(keyName);
+            Text boundKeysText = keyBinding.getBoundKeysLocalizedText();
+            int keyNameWidth = textRenderer.getWidth(boundKeysText);
             context.drawText(
-                textRenderer,
-                Text.literal(keyName),
-                x + entryWidth - keyNameWidth - 10,
-                contentY,
-                0xAAAAAA,
-                false
+                    textRenderer,
+                    boundKeysText,
+                    x + entryWidth - keyNameWidth - 10,
+                    contentY,
+                    0xAAAAAA,
+                    false
             );
+        }
+
+        @Override
+        public List<? extends Selectable> selectableChildren() {
+            return List.of();
+        }
+
+        @Override
+        public boolean mouseClicked(double mouseX, double mouseY, int button) {
+            if (isMouseOver(mouseX, mouseY)) {
+                if (button == 1) {
+                    onReset.accept(keyBinding);
+                    return true;
+                }
+                sharedData.selectedKeyBinding = keyBinding;
+                sharedData.selectedKeyCode = null;
+                return true;
+            }
+            return false;
         }
     }
 }
