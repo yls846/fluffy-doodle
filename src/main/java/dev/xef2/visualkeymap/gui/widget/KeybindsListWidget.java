@@ -5,8 +5,6 @@ import dev.xef2.visualkeymap.gui.screen.VisualKeymapScreen;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.font.TextRenderer;
 import net.minecraft.client.gui.DrawContext;
-import net.minecraft.client.gui.Element;
-import net.minecraft.client.gui.Selectable;
 import net.minecraft.client.gui.widget.ElementListWidget;
 import net.minecraft.text.Text;
 
@@ -93,15 +91,6 @@ public class KeybindsListWidget extends ElementListWidget<KeybindsListWidget.Ent
                     0xAAAAAA,
                     false
             );
-        }
-
-        // 注意：以下两个方法去掉了 @Override，确保方法名与 Fabric 映射一致
-        public List<? extends Selectable> selectableChildren() {
-            return List.of();
-        }
-
-        public List<? extends Element> children() {
-            return List.of();
         }
 
         @Override
