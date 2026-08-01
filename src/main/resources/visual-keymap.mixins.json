@@ -1,18 +1,10 @@
 {
-    "required": true,
-    "minVersion": "0.8",
-    "package": "dev.xef2.visualkeymap.mixin",
-    "compatibilityLevel": "JAVA_21",
-    "mixins": [
-    ],
-    "client": [
-        "ControlsOptionsScreenMixin",
-        "KeyBindingAccessor"
-    ],
-    "injectors": {
-        "defaultRequire": 1
-    },
-    "overwrites": {
-        "requireAnnotations": true
-    }
+  "required": true,
+  "package": "dev.xef2.visualkeymap.mixin",
+  "compatibilityLevel": "JAVA_21",
+  "mixins": [],
+  "client": [],
+  "injectors": {
+    "defaultRequire": 1
+  }
 }
