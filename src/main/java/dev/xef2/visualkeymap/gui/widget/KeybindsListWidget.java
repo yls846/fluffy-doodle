@@ -5,6 +5,7 @@ import dev.xef2.visualkeymap.gui.screen.VisualKeymapScreen;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.font.TextRenderer;
 import net.minecraft.client.gui.DrawContext;
+import net.minecraft.client.gui.Element;
 import net.minecraft.client.gui.Selectable;
 import net.minecraft.client.gui.widget.ElementListWidget;
 import net.minecraft.text.Text;
@@ -72,12 +73,13 @@ public class KeybindsListWidget extends ElementListWidget<KeybindsListWidget.Ent
             int contentX = x + 5;
 
             Text displayName = keyBinding.getDisplayName();
+            int nameColor = (sharedData != null && sharedData.selectedKeyBinding == keyBinding) ? 0xFFFF55 : 0xFFFFFF;
             context.drawText(
                     textRenderer,
                     displayName,
                     contentX,
                     contentY,
-                    sharedData.selectedKeyBinding == keyBinding ? 0xFFFF55 : 0xFFFFFF,
+                    nameColor,
                     false
             );
 
@@ -99,14 +101,21 @@ public class KeybindsListWidget extends ElementListWidget<KeybindsListWidget.Ent
         }
 
         @Override
+        public List<? extends Element> children() {
+            return List.of();
+        }
+
+        @Override
         public boolean mouseClicked(double mouseX, double mouseY, int button) {
             if (isMouseOver(mouseX, mouseY)) {
-                if (button == 1) {
+                if (sharedData != null && button == 1) {
                     onReset.accept(keyBinding);
                     return true;
                 }
-                sharedData.selectedKeyBinding = keyBinding;
-                sharedData.selectedKeyCode = null;
+                if (sharedData != null) {
+                    sharedData.selectedKeyBinding = keyBinding;
+                    sharedData.selectedKeyCode = null;
+                }
                 return true;
             }
             return false;
