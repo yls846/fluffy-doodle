@@ -96,12 +96,12 @@ public class KeybindsListWidget extends ElementListWidget<KeybindsListWidget.Ent
         }
 
         @Override
-        public List<? extends Selectable> selectableChildren() {
+        public List<Selectable> selectableChildren() {
             return List.of();
         }
 
         @Override
-        public List<? extends Element> children() {
+        public List<Element> children() {
             return List.of();
         }
 
