@@ -3,7 +3,9 @@
   "package": "dev.xef2.visualkeymap.mixin",
   "compatibilityLevel": "JAVA_21",
   "mixins": [],
-  "client": [],
+  "client": [
+    "ControlsOptionsScreenMixin"
+  ],
   "injectors": {
     "defaultRequire": 1
   }
