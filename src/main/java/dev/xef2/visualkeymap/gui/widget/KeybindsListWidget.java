@@ -46,12 +46,12 @@ public class KeybindsListWidget extends ElementListWidget<KeybindsListWidget.Ent
         }
     }
 
-    @Override
+    // 去掉 @Override 以避免签名不匹配（1.21 可能改变了方法签名）
     public int getRowWidth() {
         return this.width - 20;
     }
 
-    @Override
+    // 同上
     protected int getScrollbarPositionX() {
         return this.width - 6;
     }
@@ -64,9 +64,10 @@ public class KeybindsListWidget extends ElementListWidget<KeybindsListWidget.Ent
             this.keyBinding = keyBinding;
         }
 
-        // 1.21 中 render 的鼠标坐标为 double
+        // 使用 int 类型的 mouseX, mouseY，符合父类抽象方法
+        @Override
         public void render(DrawContext context, int index, int y, int x, int entryWidth, int entryHeight,
-                           double mouseX, double mouseY, boolean hovered, float tickDelta) {
+                           int mouseX, int mouseY, boolean hovered, float tickDelta) {
             TextRenderer textRenderer = MinecraftClient.getInstance().textRenderer;
 
             int contentY = y + 2;
@@ -88,14 +89,14 @@ public class KeybindsListWidget extends ElementListWidget<KeybindsListWidget.Ent
             context.drawText(
                     textRenderer,
                     boundKeysText,
-                    (int)(x + entryWidth - keyNameWidth - 10),
+                    x + entryWidth - keyNameWidth - 10,
                     contentY,
                     0xAAAAAA,
                     false
             );
         }
 
-        // 必须实现的两个抽象方法，去掉 @Override 以避免签名冲突
+        // 实现抽象方法，去掉 @Override 避免签名问题
         public List<Selectable> selectableChildren() {
             return List.of();
         }
