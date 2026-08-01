@@ -3,8 +3,6 @@ package dev.xef2.visualkeymap;
 import dev.xef2.visualkeymap.api.KeyBinding;
 import dev.xef2.visualkeymap.api.MinecraftImpl;
 import dev.xef2.visualkeymap.api.VisualKeymapApi;
-import dev.xef2.visualkeymap.integration.CommandKeysIntegration;
-import dev.xef2.visualkeymap.integration.MaLiLibIntegration;
 import net.fabricmc.api.ClientModInitializer;
 import net.fabricmc.loader.api.FabricLoader;
 
@@ -27,14 +25,6 @@ public class VisualKeymap implements ClientModInitializer {
             } catch (Throwable ignored) {
             }
         });
-
-        if (FabricLoader.getInstance().isModLoaded("malilib")) {
-            apiImpl.add(new MaLiLibIntegration());
-        }
-
-        if (FabricLoader.getInstance().isModLoaded("commandkeys")) {
-            apiImpl.add(new CommandKeysIntegration());
-        }
     }
 
     public static List<? extends KeyBinding> getKeyBindings() {

@@ -16,9 +16,6 @@
     "entrypoints": {
         "client": [
             "dev.xef2.visualkeymap.VisualKeymap"
-        ],
-        "modmenu": [
-            "dev.xef2.visualkeymap.compact.modmenu.ModMenuImpl"
         ]
     },
     "mixins": [
@@ -28,9 +25,5 @@
         "fabricloader": ">=${loader_version}",
         "fabric": "*",
         "minecraft": "${minecraft_version}"
-    },
-    "suggests": {
-        "malilib": ">=0.21.0 <0.22.0",
-        "commandkeys": ">=2.3.14 <2.4.0"
     }
 }
