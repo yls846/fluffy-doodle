@@ -64,7 +64,7 @@ public class KeybindsListWidget extends ElementListWidget<KeybindsListWidget.Ent
             this.keyBinding = keyBinding;
         }
 
-        // 去掉 @Override 防止签名不匹配，但方法必须命名为 render 且参数对
+        // 1.21 中 render 的鼠标坐标为 double
         public void render(DrawContext context, int index, int y, int x, int entryWidth, int entryHeight,
                            double mouseX, double mouseY, boolean hovered, float tickDelta) {
             TextRenderer textRenderer = MinecraftClient.getInstance().textRenderer;
@@ -95,88 +95,13 @@ public class KeybindsListWidget extends ElementListWidget<KeybindsListWidget.Ent
             );
         }
 
-        // 必须实现 selectableChildren，返回 List<Selectable>
+        // 必须实现的两个抽象方法，去掉 @Override 以避免签名冲突
         public List<Selectable> selectableChildren() {
             return List.of();
         }
 
         public List<Element> children() {
             return List.of();
-        }
-
-        @Override
-        public boolean mouseClicked(double mouseX, double mouseY, int button) {
-            if (isMouseOver(mouseX, mouseY)) {
-                if (sharedData != null && button == 1) {
-                    onReset.accept(keyBinding);
-                    return true;
-                }
-                if (sharedData != null) {
-                    sharedData.selectedKeyBinding = keyBinding;
-                    sharedData.selectedKeyCode = null;
-                }
-                return true;
-            }
-            return false;
-        }
-    }
-}        rebuildEntries();
-    }
-
-    private void rebuildEntries() {
-        this.clearEntries();
-        for (KeyBinding kb : this.keyBindings) {
-            this.addEntry(new Entry(kb));
-        }
-    }
-
-    @Override
-    public int getRowWidth() {
-        return this.width - 20;
-    }
-
-    @Override
-    protected int getScrollbarPositionX() {
-        return this.width - 6;
-    }
-
-    public class Entry extends ElementListWidget.Entry<Entry> {
-
-        private final KeyBinding keyBinding;
-
-        public Entry(KeyBinding keyBinding) {
-            this.keyBinding = keyBinding;
-        }
-
-        @Override
-        public void render(DrawContext context, int index, int y, int x, int entryWidth, int entryHeight,
-                           int mouseX, int mouseY, boolean hovered, float tickDelta) {
-            TextRenderer textRenderer = MinecraftClient.getInstance().textRenderer;
-
-            int contentY = y + 2;
-            int contentX = x + 5;
-
-            Text displayName = keyBinding.getDisplayName();
-            int nameColor = (sharedData != null && sharedData.selectedKeyBinding == keyBinding) ? 0xFFFF55 : 0xFFFFFF;
-            context.drawText(
-                    textRenderer,
-                    displayName,
-                    contentX,
-                    contentY,
-                    nameColor,
-                    false
-            );
-
-            Text boundKeysText = keyBinding.getBoundKeysLocalizedText();
-            int keyNameWidth = textRenderer.getWidth(boundKeysText);
-            context.drawText(
-                    textRenderer,
-                    boundKeysText,
-                    x + entryWidth - keyNameWidth - 10,
-                    contentY,
-                    0xAAAAAA,
-                    false
-            );
         }
 
         @Override
